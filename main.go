@@ -71,8 +71,19 @@ func createWindow(target string, title string, startTime time.Time, queue *Windo
 		cmd := exec.Command(exe, url)
 		cmd.Start()
 	})
-
+	
 	w.Navigate(target)
+
+	time.AfterFunc(1*time.Second, func() {
+		w.Dispatch(func() {
+			pageTitle := w.GetPageTitle()
+			if pageTitle != "" {
+				w.SetTitle(pageTitle)
+				fmt.Println("Title set to:", pageTitle)
+			}
+		})
+	})
+	
 	w.Run()
 }
 
@@ -83,6 +94,11 @@ func main() {
 	}
 	target := os.Args[1]
 
+	name := "wxn0brP"
+	if len(os.Args) > 2 {
+		name = os.Args[2]
+	}
+
 	if !strings.Contains(target, "://") {
 		target = "http://localhost:" + target
 	}
@@ -90,5 +106,5 @@ func main() {
 	startTime := time.Now()
 	queue := &WindowQueue{timestamps: []time.Time{}}
 
-	createWindow(target, "wxn0brP", startTime, queue)
+	createWindow(target, name, startTime, queue)
 }
