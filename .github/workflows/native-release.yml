@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-linux:
     runs-on: ubuntu-22.04
 
     steps:
@@ -36,16 +36,12 @@ jobs:
         run: |
           GOOS=linux GOARCH=amd64 go build -o zhiva-linux
 
-      # - name: Build Windows binary
-      #   run: |
-      #     GOOS=windows GOARCH=amd64 go build -o zhiva-windows.exe
-
       - name: Create native.version
         run: |
           echo $(git rev-parse HEAD) > zhiva.nv.txt
           ls -al
 
-      - name: Create/Update Release with assets
+      - name: Upload Linux binary to release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: native
@@ -55,6 +51,70 @@ jobs:
           files: |
             zhiva-linux
             zhiva.nv.txt
+          overwrite_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-windows:
+    runs-on: windows-latest
+    needs: build-linux
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.25"
+
+      - name: Prepare
+        run: |
+          go mod tidy
+
+      - name: Build Windows binary
+        run: |
+          set GOOS=windows
+          set GOARCH=amd64
+          go build -o zhiva-windows
+
+      - name: Upload Windows binary to release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: native
+          files: |
+            zhiva-windows
+          overwrite_files: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-macos:
+    runs-on: macos-latest
+    needs: build-linux
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.25"
+
+      - name: Prepare
+        run: |
+          go mod tidy
+
+      - name: Build macOS binary
+        run: |
+          GOOS=darwin GOARCH=amd64 go build -o zhiva-darwin
+
+      - name: Upload macOS binary to release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: native
+          files: |
+            zhiva-darwin
           overwrite_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
