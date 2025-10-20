@@ -54,18 +54,18 @@ func createWindow(target string, title string, startTime time.Time, queue *Windo
 		now := time.Now()
 
 		if now.Sub(startTime) < 10*time.Second {
-			fmt.Println("Opening new window blocked by 10s cooldown since start")
+			fmt.Println("[Z-NTV-1-01] Opening new window blocked by 10s cooldown since start")
 			return
 		}
 
 		if !queue.Add(now) {
-			fmt.Println("Limit of queue reached or cooldown of 1s has not passed")
+			fmt.Println("[Z-NTV-1-02] Limit of queue reached or cooldown of 1s has not passed")
 			return
 		}
 
 		exe, err := os.Executable()
 		if err != nil {
-			fmt.Println("Error:", err)
+			fmt.Println("[Z-NTV-1-03] Error:", err)
 			return
 		}
 		cmd := exec.Command(exe, url)
@@ -79,7 +79,7 @@ func createWindow(target string, title string, startTime time.Time, queue *Windo
 			pageTitle := w.GetPageTitle()
 			if pageTitle != "" {
 				w.SetTitle(pageTitle)
-				fmt.Println("Title set to:", pageTitle)
+				fmt.Println("[Z-NTV-1-04] Title set to:", pageTitle)
 			}
 		})
 	})
@@ -89,7 +89,7 @@ func createWindow(target string, title string, startTime time.Time, queue *Windo
 
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Printf("Usage: %s <port>\n", os.Args[0])
+		fmt.Printf("[Z-NTV-1-05] Usage: %s <port>\n", os.Args[0])
 		return
 	}
 	target := os.Args[1]
