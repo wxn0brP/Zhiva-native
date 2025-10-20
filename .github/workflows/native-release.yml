@@ -83,7 +83,7 @@ jobs:
         with:
           tag_name: native
           files: |
-            zhiva-windows
+            zhiva-win32
           overwrite_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
