@@ -76,7 +76,7 @@ jobs:
         run: |
           set GOOS=windows
           set GOARCH=amd64
-          go build -o zhiva-windows
+          go build -o zhiva-win32
 
       - name: Upload Windows binary to release
         uses: softprops/action-gh-release@v2
