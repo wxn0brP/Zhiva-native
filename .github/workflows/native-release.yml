@@ -76,14 +76,14 @@ jobs:
         run: |
           set GOOS=windows
           set GOARCH=amd64
-          go build -o zhiva-win32
+          go build -o zhiva-win32.exe
 
       - name: Upload Windows binary to release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: native
           files: |
-            zhiva-win32
+            zhiva-win32.exe
           overwrite_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
