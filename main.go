@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bufio"
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
@@ -49,6 +51,7 @@ func createWindow(target string, title string, startTime time.Time, queue *Windo
 	})
 	w.Bind("zhiva_isApp", func() bool { return true })
 	w.Bind("zhiva_closeApp", func() { w.Dispatch(w.Terminate) })
+	w.Bind("zhiva_echo", func(data string) { fmt.Println(data) })
 
 	w.Bind("zhiva_openWindow", func(url string) {
 		now := time.Now()
@@ -71,7 +74,38 @@ func createWindow(target string, title string, startTime time.Time, queue *Windo
 		cmd := exec.Command(exe, url)
 		cmd.Start()
 	})
-	
+
+	go func() {
+		scanner := bufio.NewScanner(os.Stdin)
+		for scanner.Scan() {
+			line := scanner.Text()
+			if !strings.Contains(line, "[JSON]") {
+				continue
+			}
+
+			start := strings.Index(line, "[JSON]{")
+			end := strings.Index(line, "}[/JSON]")
+			if start == -1 || end == -1 || end <= start+6 {
+				continue
+			}
+
+			jsonPayload := line[start+6 : end+1]
+
+			w.Dispatch(func() {
+			jsCode := fmt.Sprintf(
+				"if (typeof zhiva_receive === 'function') zhiva_receive(%s, %s);",
+				jsonPayload, "`"+jsonPayload+"`",
+			)
+			w.Eval(jsCode)
+				w.Eval(jsCode)
+			})
+		}
+
+		if err := scanner.Err(); err != nil {
+			fmt.Fprintln(os.Stderr, "[Z-NTV-1-06] Error reading standard input:", err)
+		}
+	}()
+
 	w.Navigate(target)
 
 	time.AfterFunc(1*time.Second, func() {
@@ -83,7 +117,7 @@ func createWindow(target string, title string, startTime time.Time, queue *Windo
 			}
 		})
 	})
-	
+
 	w.Run()
 }
 
