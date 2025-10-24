@@ -55,8 +55,8 @@ func createWindow(target string, title string, startTime time.Time, queue *Windo
 	w.Bind("zhiva_openWindow", func(url string) {
 		now := time.Now()
 
-		if now.Sub(startTime) < 10*time.Second {
-			fmt.Println("[Z-NTV-1-01] Opening new window blocked by 10s cooldown since start")
+		if now.Sub(startTime) < 5*time.Second {
+			fmt.Println("[Z-NTV-1-01] Opening new window blocked by 5s cooldown since start")
 			return
 		}
 
