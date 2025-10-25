@@ -68,12 +68,16 @@ jobs:
         with:
           go-version: "1.25"
 
+      - name: Install rsrc tool
+        run: go install github.com/akavel/rsrc@latest
+
       - name: Prepare
         run: |
           go mod tidy
 
       - name: Build Windows binary
         run: |
+          rsrc -ico app.ico -o rsrc.syso
           set GOOS=windows
           set GOARCH=amd64
           go build -o zhiva-win32.exe
