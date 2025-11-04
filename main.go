@@ -45,6 +45,23 @@ func createWindow(target string, title string, startTime time.Time, queue *Windo
 	w.SetSize(1600, 900, webview.HintNone)
 	w.Maximize()
 
+	w.Init(`
+		document.addEventListener('DOMContentLoaded', () => {
+			const titleObserver = new MutationObserver((mutations) => {
+				mutations.forEach((mutation) => {
+					if (mutation.type === 'attributes' && mutation.attributeName === 'title') {
+						window.zhiva_setWindowTitle(mutation.target.title)
+					}
+				})
+			});
+			const titleElement = document.querySelector('title');
+			titleObserver.observe(titleElement, {
+				attributes: true
+			});
+			zhiva_setWindowTitle(document.title);
+		});
+	`)
+
 	w.Bind("zhiva_setWindowTitle", func(newTitle string) {
 		w.Dispatch(func() { w.SetTitle(newTitle) })
 	})
@@ -91,11 +108,11 @@ func createWindow(target string, title string, startTime time.Time, queue *Windo
 			jsonPayload := line[start+6 : end+1]
 
 			w.Dispatch(func() {
-			jsCode := fmt.Sprintf(
-				"if (typeof zhiva_receive === 'function') zhiva_receive(%s, %s);",
-				jsonPayload, "`"+jsonPayload+"`",
-			)
-			w.Eval(jsCode)
+				jsCode := fmt.Sprintf(
+					"if (typeof zhiva_receive === 'function') zhiva_receive(%s, %s);",
+					jsonPayload, "`"+jsonPayload+"`",
+				)
+				w.Eval(jsCode)
 				w.Eval(jsCode)
 			})
 		}
@@ -106,16 +123,6 @@ func createWindow(target string, title string, startTime time.Time, queue *Windo
 	}()
 
 	w.Navigate(target)
-
-	time.AfterFunc(1*time.Second, func() {
-		w.Dispatch(func() {
-			pageTitle := w.GetPageTitle()
-			if pageTitle != "" {
-				w.SetTitle(pageTitle)
-				fmt.Println("[Z-NTV-1-04] Title set to:", pageTitle)
-			}
-		})
-	})
 
 	w.Run()
 }
