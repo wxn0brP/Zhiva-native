@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"runtime"
 	"strings"
 	"sync"
 	"time"
@@ -55,10 +56,20 @@ func createWindow(target string, title string, startTime time.Time, queue *Windo
 				})
 			});
 			const titleElement = document.querySelector('title');
-			titleObserver.observe(titleElement, {
-				attributes: true
-			});
+			if (titleElement) {
+				titleObserver.observe(titleElement, {
+					attributes: true
+				});
+			}
 			zhiva_setWindowTitle(document.title);
+
+			document.addEventListener('click', (e) => {
+				const anchor = e.target.closest('a');
+				if (anchor && anchor.target === '_blank') {
+					e.preventDefault();
+					zhiva_openExternal(anchor.href);
+				}
+			}, true);
 		});
 	`)
 
@@ -68,6 +79,30 @@ func createWindow(target string, title string, startTime time.Time, queue *Windo
 	w.Bind("zhiva_isApp", func() bool { return true })
 	w.Bind("zhiva_closeApp", func() { w.Dispatch(w.Terminate) })
 	w.Bind("zhiva_echo", func(data string) { fmt.Println(data) })
+
+	w.Bind("zhiva_openExternal", func(url string) {
+		if !strings.HasPrefix(url, "http://") && !strings.HasPrefix(url, "https://") {
+			fmt.Println("[Z-NTV-1-07] Invalid URL for external open:", url)
+			return
+		}
+
+		var cmd *exec.Cmd
+		switch runtime.GOOS {
+		case "linux":
+			cmd = exec.Command("xdg-open", url)
+		case "windows":
+			cmd = exec.Command("cmd", "/c", "start", url)
+		case "darwin":
+			cmd = exec.Command("open", url)
+		default:
+			fmt.Println("[Z-NTV-1-08] Unsupported platform for opening external URL:", runtime.GOOS)
+			return
+		}
+		err := cmd.Start()
+		if err != nil {
+			fmt.Println("[Z-NTV-1-09] Error opening external URL:", err)
+		}
+	})
 
 	w.Bind("zhiva_openWindow", func(url string) {
 		now := time.Now()
