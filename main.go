@@ -70,6 +70,12 @@ func createWindow(target string, title string, startTime time.Time, queue *Windo
 					zhiva_openExternal(anchor.href);
 				}
 			}, true);
+
+			window.addEventListener("message", (event) => {
+				if (event.data && event.data.type === "open-link") {
+					zhiva_openExternal(event.data.url);
+				}
+			});
 		});
 	`)
 
