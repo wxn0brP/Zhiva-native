@@ -45,6 +45,7 @@ func createWindow(target string, title string, startTime time.Time, queue *Windo
 	w.SetTitle(title)
 	w.SetSize(1600, 900, webview.HintNone)
 	w.Maximize()
+	setDarkTitleBar(w)
 
 	w.Init(`
 		document.addEventListener('DOMContentLoaded', () => {
