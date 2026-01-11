@@ -9,116 +9,86 @@ on:
 
 jobs:
   build-linux:
-    runs-on: ubuntu-22.04
-
+    name: Build and Release on Ubuntu
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Install GTK and WebKit2GTK dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y software-properties-common
-          sudo add-apt-repository universe
-          sudo apt-get update
           sudo apt-get install -y pkg-config libgtk-3-dev libwebkit2gtk-4.0-dev build-essential
 
-      - name: Set up Go
-        uses: actions/setup-go@v6
-        with:
-          go-version: "1.25"
-
-      - name: Prepare
+      - name: Configure and build
         run: |
-          go mod tidy
-
-      - name: Build Linux binary
-        run: |
-          GOOS=linux GOARCH=amd64 go build -o zhiva-linux
+          mkdir build
+          cd build
+          cmake ..
+          cmake --build .
+          mv bin/zhiva ../zhiva-linux
 
       - name: Create native.version
-        run: |
-          echo $(git rev-parse HEAD) > zhiva.nv.txt
-          ls -al
+        run: echo $(git rev-parse HEAD) > zhiva.nv.txt
 
-      - name: Upload Linux binary to release
+      - name: Create native release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: native
-          name: native
+          name: Native Continuous Build
           draft: false
           prerelease: false
           files: |
             zhiva-linux
             zhiva.nv.txt
-          overwrite_files: true
+          body: "This release is continuously updated with the latest build from the main branch."
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-windows:
+    name: Build on Windows
     runs-on: windows-latest
     needs: build-linux
-
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
 
-      - name: Set up Go
-        uses: actions/setup-go@v6
-        with:
-          go-version: "1.25"
-
-      - name: Install rsrc tool
-        run: go install github.com/akavel/rsrc@latest
-
-      - name: Prepare
+      - name: Configure and build
         run: |
-          go mod tidy
-
-      - name: Build Windows binary
-        run: |
-          rsrc -ico app.ico -o rsrc.syso
-          set GOOS=windows
-          set GOARCH=amd64
-          go build -o zhiva-win32.exe
+          mkdir build
+          cd build
+          cmake ..
+          cmake --build . --config Release
+          move bin\Release\zhiva.exe ..\zhiva-win32.exe
 
       - name: Upload Windows binary to release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: native
-          files: |
-            zhiva-win32.exe
-          overwrite_files: true
+          files: zhiva-win32.exe
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-macos:
+    name: Build on macOS
     runs-on: macos-latest
     needs: build-linux
-
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
 
-      - name: Set up Go
-        uses: actions/setup-go@v6
-        with:
-          go-version: "1.25"
-
-      - name: Prepare
+      - name: Configure and build
         run: |
-          go mod tidy
-
-      - name: Build macOS binary
-        run: |
-          go build -o zhiva-darwin
+          mkdir build
+          cd build
+          cmake ..
+          cmake --build .
+          mv bin/zhiva ../zhiva-darwin
 
       - name: Upload macOS binary to release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: native
-          files: |
-            zhiva-darwin
-          overwrite_files: true
+          files: zhiva-darwin
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
