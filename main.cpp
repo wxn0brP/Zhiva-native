@@ -9,6 +9,7 @@
 
 #if defined(_WIN32)
 #include <windows.h>
+#include <dwmapi.h>
 #endif
 
 #ifdef WEBVIEW_GTK
@@ -118,6 +119,8 @@ int main(int argc, char *argv[]) {
         SendMessage((HWND)webview_get_window(w), WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
         SendMessage((HWND)webview_get_window(w), WM_SETICON, ICON_BIG, (LPARAM)hIcon);
     }
+    BOOL use_dark_mode = TRUE;
+    DwmSetWindowAttribute((HWND)webview_get_window(w), 20, &use_dark_mode, sizeof(use_dark_mode));
 #endif
 
 #ifdef WEBVIEW_GTK

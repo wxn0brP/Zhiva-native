@@ -18,5 +18,6 @@ target_sources(zhiva PRIVATE main.cpp)
 
 if(WIN32)
     target_sources(zhiva PRIVATE icon.rc)
+    target_link_libraries(zhiva PRIVATE dwmapi)
 endif()
 target_link_libraries(zhiva PRIVATE webview::core)
