@@ -51,7 +51,6 @@ jobs:
   build-windows:
     name: Build on Windows
     runs-on: windows-latest
-    needs: build-linux
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -75,7 +74,6 @@ jobs:
   build-macos:
     name: Build on macOS
     runs-on: macos-latest
-    needs: build-linux
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
