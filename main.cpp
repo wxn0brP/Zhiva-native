@@ -7,6 +7,10 @@
 #include <thread>
 #include <cstdlib>
 
+#if defined(_WIN32)
+#include <windows.h>
+#endif
+
 #ifdef WEBVIEW_GTK
 #include <gtk/gtk.h>
 #endif
@@ -110,6 +114,8 @@ int main(int argc, char *argv[]) {
 
 #ifdef WEBVIEW_GTK
     gtk_window_maximize(GTK_WINDOW(webview_get_window(w)));
+#elif defined(_WIN32)
+    ShowWindow((HWND)webview_get_window(w), SW_MAXIMIZE);
 #else
     webview_set_size(w, 1600, 900, WEBVIEW_HINT_NONE);
 #endif

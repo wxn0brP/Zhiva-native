@@ -15,4 +15,8 @@ FetchContent_MakeAvailable(webview)
 
 add_executable(zhiva)
 target_sources(zhiva PRIVATE main.cpp)
+
+if(WIN32)
+    target_sources(zhiva PRIVATE icon.rc)
+endif()
 target_link_libraries(zhiva PRIVATE webview::core)
