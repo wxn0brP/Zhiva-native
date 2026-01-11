@@ -10,10 +10,10 @@ on:
 jobs:
   build-linux:
     name: Build and Release on Ubuntu
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install GTK and WebKit2GTK dependencies
         run: |
@@ -54,7 +54,7 @@ jobs:
     needs: build-linux
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Configure and build
         run: |
@@ -78,7 +78,7 @@ jobs:
     needs: build-linux
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Configure and build
         run: |
