@@ -13,17 +13,23 @@ FetchContent_Declare(
     GIT_TAG 0.12.0)
 FetchContent_MakeAvailable(webview)
 
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(WEBKIT2GTK REQUIRED webkit2gtk-4.1)
-
 add_executable(zhiva)
 target_sources(zhiva PRIVATE main.cpp)
 
-target_include_directories(zhiva PRIVATE ${WEBKIT2GTK_INCLUDE_DIRS})
-target_compile_options(zhiva PRIVATE ${WEBKIT2GTK_CFLAGS_OTHER})
+if(UNIX AND NOT APPLE)
+    # Linux-specific configuration
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(WEBKIT2GTK REQUIRED webkit2gtk-4.1)
+
+    target_include_directories(zhiva PRIVATE ${WEBKIT2GTK_INCLUDE_DIRS})
+    target_compile_options(zhiva PRIVATE ${WEBKIT2GTK_CFLAGS_OTHER})
+    target_link_libraries(zhiva PRIVATE webview::core ${WEBKIT2GTK_LIBRARIES})
+else()
+    # Windows and macOS use default webview bindings
+    target_link_libraries(zhiva PRIVATE webview::core)
+endif()
 
 if(WIN32)
     target_sources(zhiva PRIVATE icon.rc)
     target_link_libraries(zhiva PRIVATE dwmapi)
 endif()
-target_link_libraries(zhiva PRIVATE webview::core ${WEBKIT2GTK_LIBRARIES})
