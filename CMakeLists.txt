@@ -14,7 +14,14 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(webview)
 
 add_executable(zhiva)
-target_sources(zhiva PRIVATE main.cpp)
+target_sources(zhiva PRIVATE
+    src/main.cpp
+    src/bindings.cpp
+    src/init_script.cpp
+    src/launch_options.cpp
+    src/platform_window.cpp
+    src/zhiva_scheme.cpp
+)
 
 if(UNIX AND NOT APPLE)
     # Linux-specific configuration

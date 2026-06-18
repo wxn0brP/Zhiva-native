@@ -7,6 +7,9 @@ on:
 
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build-linux:
     name: Build and Release on Ubuntu
@@ -25,11 +28,9 @@ jobs:
 
       - name: Configure and build
         run: |
-          mkdir build
-          cd build
-          cmake ..
-          cmake --build .
-          mv bin/zhiva ../zhiva-linux
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --config Release
+          mv build/bin/zhiva zhiva-linux
 
       - name: Create native.version
         run: echo $(git rev-parse HEAD) > zhiva.nv.txt
@@ -57,11 +58,9 @@ jobs:
 
       - name: Configure and build
         run: |
-          mkdir build
-          cd build
-          cmake ..
-          cmake --build . --config Release
-          move bin\Release\zhiva.exe ..\zhiva-win32.exe
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --config Release
+          move build\bin\Release\zhiva.exe zhiva-win32.exe
 
       - name: Upload Windows binary to release
         uses: softprops/action-gh-release@v2
@@ -80,11 +79,9 @@ jobs:
 
       - name: Configure and build
         run: |
-          mkdir build
-          cd build
-          cmake ..
-          cmake --build .
-          mv bin/zhiva ../zhiva-darwin
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+          cmake --build build --config Release
+          mv build/bin/zhiva zhiva-darwin
 
       - name: Upload macOS binary to release
         uses: softprops/action-gh-release@v2
