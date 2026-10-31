@@ -41,7 +41,7 @@ namespace
 
         const gchar *path = g_uri_get_path(uri);
         const gchar *query = g_uri_get_query(uri);
-        std::string target = context->backend_is_socket ? "http://zhiva.local" : context->backend;
+        std::string target = context->backend_is_socket ? "http://zhiva-runtime.local" : context->backend;
         if (!target.empty() && target.back() == '/')
         {
             target.pop_back();
