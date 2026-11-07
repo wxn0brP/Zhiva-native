@@ -36,7 +36,7 @@ jobs:
         run: echo $(git rev-parse HEAD) > zhiva.nv.txt
 
       - name: Create native release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: native
           name: Native Continuous Build
@@ -63,7 +63,7 @@ jobs:
           move build\bin\Release\zhiva.exe zhiva-win32.exe
 
       - name: Upload Windows binary to release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: native
           files: zhiva-win32.exe
@@ -84,7 +84,7 @@ jobs:
           mv build/bin/zhiva zhiva-darwin
 
       - name: Upload macOS binary to release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: native
           files: zhiva-darwin
